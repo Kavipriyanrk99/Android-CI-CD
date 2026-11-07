@@ -72,6 +72,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("release")
+                .takeIf {
+                    it.storeFile != null
+                            && it.storePassword != null
+                            && it.keyAlias != null
+                            && it.keyPassword != null
+                }
         }
 
         // AGP >= 9.3
