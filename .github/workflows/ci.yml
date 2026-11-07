@@ -2,11 +2,19 @@ name: Android CI
 on:
   pull_request:
     branches: [ main ]
-    paths-ignore: [ '**.md' ]
+    # Documentation-only changes do not need an Android build.
+    paths-ignore: [ '**/*.md' ]
   push:
     branches: [ main ]
-    paths-ignore: [ '**.md' ]
+    # Documentation-only changes do not need an Android build.
+    paths-ignore: [ '**/*.md' ]
 
+
+# Groups workflow runs by workflow name and branch.
+# If a new run starts for the same workflow and branch,
+# GitHub automatically cancels the previous run still in progress.
+# Example: If you push 3 commits to the same branch quickly, GitHub cancels the workflow running
+# for commit 1 and commit 2, keeping the latest run (commit 3).
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -48,11 +56,13 @@ jobs:
       - name: Assemble release (unsigned)
         run: ./gradlew assembleRelease --stacktrace
 
+      # always() ensures reports are uploaded even when an
+      # earlier test, lint, or build step fails.
       - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: Test Reports
+          name: android-ci-reports
           path: |
             ./app/build/reports/tests
             ./app/build/reports/lint-results-*.html
