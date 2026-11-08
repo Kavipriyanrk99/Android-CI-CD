@@ -117,8 +117,8 @@ android {
 
         create("india") {
             dimension = "country"
-            applicationIdSuffix = ".in"
-            versionNameSuffix = "-in"
+//            applicationIdSuffix = ".in"
+//            versionNameSuffix = "-in"
 
             buildConfigField(
                 "String", "API_BASE_URL", "\"https://api.example.in\""
@@ -127,8 +127,8 @@ android {
 
         create("usa") {
             dimension = "country"
-            applicationIdSuffix = ".us"
-            versionNameSuffix = "-us"
+//            applicationIdSuffix = ".us"
+//            versionNameSuffix = "-us"
 
             buildConfigField(
                 "String", "API_BASE_URL", "\"https://api.example.us\""
