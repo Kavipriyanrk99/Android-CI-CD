@@ -11,16 +11,7 @@ val keystoreProps = Properties().apply {
     if (keystoreFile.exists()) keystoreFile.inputStream().use { load(it) }
 }
 
-val versionTag = System.getenv("VERSION_TAG") ?: "v1.0.0"
-val version = versionTag.removePrefix("v")
-val parts = version.split(".").map { it.toInt() }
-
-val major = parts[0]
-val minor = parts[1]
-val patch = parts[2]
-
-// Example: 2.3.1 -> 20301
-val calculatedVersionCode = major * 10_000 + minor * 100 + patch
+val ciBuildNumber = System.getenv("CI_BUILD_NUMBER")?.toInt() ?: 1
 
 android {
     namespace = "com.example.cicd"
@@ -34,8 +25,8 @@ android {
         applicationId = "com.example.cicd"
         minSdk = 24
         targetSdk = 36
-        versionCode = calculatedVersionCode
-        versionName = version
+        versionCode = ciBuildNumber
+        versionName = "$ciBuildNumber"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

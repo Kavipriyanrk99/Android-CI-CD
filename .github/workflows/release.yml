@@ -1,7 +1,6 @@
 name: App Release
 on:
   push:
-    branches: [main]
     tags: [ 'v*' ]
   workflow_dispatch:
     inputs:
@@ -51,8 +50,8 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          VERSION_TAG: ${{ github.ref_name }}
-        run: ./gradlew assemble${{ inputs.variant }} bundle${{ inputs.variant }}
+          CI_BUILD_NUMBER: ${{ github.run_number }}
+        run: ./gradlew assemble${{ inputs.variant || 'Release' }} bundle${{ inputs.variant || 'Release' }} --stacktrace
 
       - name: install firebase cli
         run: curl -sL https://firebase.tools | bash
