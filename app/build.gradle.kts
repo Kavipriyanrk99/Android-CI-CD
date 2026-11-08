@@ -11,6 +11,17 @@ val keystoreProps = Properties().apply {
     if (keystoreFile.exists()) keystoreFile.inputStream().use { load(it) }
 }
 
+val versionTag = System.getenv("VERSION_TAG") ?: "v1.0.0"
+val version = versionTag.removePrefix("v")
+val parts = version.split(".").map { it.toInt() }
+
+val major = parts[0]
+val minor = parts[1]
+val patch = parts[2]
+
+// Example: 2.3.1 -> 20301
+val calculatedVersionCode = major * 10_000 + minor * 100 + patch
+
 android {
     namespace = "com.example.cicd"
     compileSdk {
@@ -23,8 +34,8 @@ android {
         applicationId = "com.example.cicd"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = calculatedVersionCode
+        versionName = version
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -155,9 +166,10 @@ android {
 androidComponents {
     beforeVariants { variantBuilder ->
         // exclude prod flavor with debug build
-        val excludeVariant = variantBuilder.productFlavors
-            .contains("environments" to "prod")
-                && variantBuilder.buildType == "debug"
+        val excludeVariant = (variantBuilder.productFlavors.contains("environments" to "prod")
+                && variantBuilder.buildType == "debug")
+                || (variantBuilder.productFlavors.contains("environments" to "dev")
+                && variantBuilder.buildType == "release")
 
         if (excludeVariant)
             variantBuilder.enable = false
