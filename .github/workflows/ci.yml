@@ -27,6 +27,12 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # Run instrumentation tests on multiple Android API levels
+    # to verify compatibility across different Android versions.
+    strategy:
+      fail-fast: false
+      matrix:
+        api-level: [ 29, 31, 34, 37 ]
 
     steps:
       - name: Checkout code
@@ -53,6 +59,43 @@ jobs:
       - name: Run lints
         run: ./gradlew lint --stacktrace
 
+      # instrumentation test
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: AVD cache
+        uses: actions/cache@v5
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.api-level }}-x86_64
+
+      - name: Create AVD snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
+
+      - name: Run instrumentation tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: ./gradlew connectedAndroidTest --stacktrace
+
       - name: Assemble release (unsigned)
         run: ./gradlew assembleRelease --stacktrace
 
@@ -64,6 +107,8 @@ jobs:
         with:
           name: android-ci-reports
           path: |
-            ./app/build/reports/tests
-            ./app/build/reports/lint-results-*.html
+            app/build/reports/tests
+            app/build/reports/lint-results-*.html
+            app/build/reports/androidTests
+            app/build/outputs/androidTest-results/**/*.xml
           retention-days: 7
