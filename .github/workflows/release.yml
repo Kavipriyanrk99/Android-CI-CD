@@ -65,10 +65,20 @@ jobs:
                 echo "Uploading APK: $apk"
                 echo "=================================="
           
+                release_notes="$(git log -1 --pretty=%B)"
+
+                if [[ "$apk" == *india* ]]; then
+                  release_notes="$release_notes - release india"
+                elif [[ "$apk" == *usa* ]]; then
+                  release_notes="$release_notes - release usa"
+                fi
+
+                echo "Release notes: $release_notes"
+          
                 firebase appdistribution:distribute "$apk" \
                   --app "${{ secrets.FIREBASE_APP_ID }}" \
                   --groups "qa" \
-                  --release-notes "$(git log -1 --pretty=%B)"
+                  --release-notes "$release_notes"
               done
 
       - name: upload bundle and mapping
