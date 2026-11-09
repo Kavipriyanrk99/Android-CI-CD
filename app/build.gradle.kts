@@ -118,7 +118,10 @@ android {
         create("india") {
             dimension = "country"
 //            applicationIdSuffix = ".in"
-//            versionNameSuffix = "-in"
+
+            // Firebase App Distribution strictly relies on the internal Android Application ID (package name), Version Code,
+            // and Version Name to identify and organize releases.
+            versionNameSuffix = "-in"
 
             buildConfigField(
                 "String", "API_BASE_URL", "\"https://api.example.in\""
@@ -128,7 +131,10 @@ android {
         create("usa") {
             dimension = "country"
 //            applicationIdSuffix = ".us"
-//            versionNameSuffix = "-us"
+
+            // Firebase App Distribution strictly relies on the internal Android Application ID (package name), Version Code,
+            // and Version Name to identify and organize releases.
+            versionNameSuffix = "-us"
 
             buildConfigField(
                 "String", "API_BASE_URL", "\"https://api.example.us\""
