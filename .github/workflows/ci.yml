@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api-level: [ 29, 31, 34, 37 ]
+        api-level: [ 29, 31, 34, 36 ]
 
     steps:
       - name: Checkout code
