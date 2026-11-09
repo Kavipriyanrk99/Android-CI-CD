@@ -61,6 +61,10 @@ jobs:
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > "$RUNNER_TEMP/sa.json"
           export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
           find app/build/ -type f -name "*.apk" | while read -r apk; do
+                echo "=================================="
+                echo "Uploading APK: $apk"
+                echo "=================================="
+          
                 firebase appdistribution:distribute "$apk" \
                   --app "${{ secrets.FIREBASE_APP_ID }}" \
                   --groups "qa" \
